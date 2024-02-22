@@ -1,0 +1,22 @@
+NAMESPACE                       NAME                                     READY   STATUS    RESTARTS        AGE
+kube-system                     calico-node-kprbr                        1/1     Running   0               97m
+kube-system                     coredns-864597b5fd-sqs2p                 1/1     Running   0               97m
+kube-system                     calico-kube-controllers-77bd7c5b-9lsd5   1/1     Running   0               97m
+kube-system                     hostpath-provisioner-7df77bc496-q87nd    1/1     Running   0               68m
+controller-test-k8s-localhost   controller-0                             3/3     Running   0               62m
+controller-test-k8s-localhost   modeloperator-74d98bc8c8-sbcqm           1/1     Running   0               61m
+test                            modeloperator-6f99995664-549s4           1/1     Running   0               60m
+test                            catalogue-0                              2/2     Running   0               28m
+test                            alertmanager-0                           2/2     Running   0               26m
+test                            traefik-0                                2/2     Running   0               26m
+test                            loki-0                                   2/2     Running   0               25m
+test                            grafana-0                                3/3     Running   0               25m
+test                            prometheus-0                             2/2     Running   0               25m
+test                            mysql-k8s-1                              2/2     Running   0               28m
+test                            mysql-k8s-3                              2/2     Running   0               28m
+test                            mysql-k8s-2                              2/2     Running   0               28m
+test                            app-0                                    1/1     Running   0               17m
+test                            mysql-k8s-0                              2/2     Running   1 (8m43s ago)   28m
+test                            mysql-k8s-4                              2/2     Running   1 (8m43s ago)   28m
+test                            mysql-k8s-5                              2/2     Running   0               10m
+test                            mysql-k8s-6                              2/2     Running   0               10m

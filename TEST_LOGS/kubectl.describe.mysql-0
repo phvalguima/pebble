@@ -1,0 +1,154 @@
+Name:             mysql-k8s-0
+Namespace:        test
+Priority:         0
+Service Account:  mysql-k8s
+Node:             desktopdone/192.168.0.228
+Start Time:       Thu, 22 Feb 2024 17:16:29 +0100
+Labels:           app.juju.is/created-by=mysql-k8s
+                  app.kubernetes.io/name=mysql-k8s
+                  apps.kubernetes.io/pod-index=0
+                  cluster-name=cluster-b1352edf6d4d92e6805ca445023e92d5
+                  controller-revision-hash=mysql-k8s-594fcd5d78
+                  role=replicas
+                  statefulset.kubernetes.io/pod-name=mysql-k8s-0
+Annotations:      cni.projectcalico.org/containerID: 32f78790ef18321a79287ae7504fbeca33eb3645ebf81330ef08d9b17acf9bca
+                  cni.projectcalico.org/podIP: 10.1.166.141/32
+                  cni.projectcalico.org/podIPs: 10.1.166.141/32
+                  controller.juju.is/id: 3365d7ea-bc51-426e-826b-593c81121f59
+                  juju.is/version: 3.5-beta1.1
+                  model.juju.is/id: 598ad5f6-cb41-44f4-8e12-78cc01261f6a
+                  unit.juju.is/id: mysql-k8s/0
+Status:           Running
+IP:               10.1.166.141
+IPs:
+  IP:           10.1.166.141
+Controlled By:  StatefulSet/mysql-k8s
+Init Containers:
+  charm-init:
+    Container ID:  containerd://0e576865fbc98fc8addfd12b316140533c9e591c0867e8a8f8be1afec18c58a2
+    Image:         docker.io/jujusolutions/jujud-operator:3.5-beta1.1
+    Image ID:      sha256:a8a621762f94ebf3d3c31c77cc2f3c4787fcd01affe3cd78c300321151272a8e
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /opt/containeragent
+    Args:
+      init
+      --containeragent-pebble-dir
+      /containeragent/pebble
+      --charm-modified-version
+      0
+      --data-dir
+      /var/lib/juju
+      --bin-dir
+      /charm/bin
+    State:          Terminated
+      Reason:       Completed
+      Exit Code:    0
+      Started:      Thu, 22 Feb 2024 17:16:29 +0100
+      Finished:     Thu, 22 Feb 2024 17:16:31 +0100
+    Ready:          True
+    Restart Count:  0
+    Environment Variables from:
+      mysql-k8s-application-config  Secret  Optional: false
+    Environment:
+      JUJU_CONTAINER_NAMES:  mysql
+      JUJU_K8S_POD_NAME:     mysql-k8s-0 (v1:metadata.name)
+      JUJU_K8S_POD_UUID:      (v1:metadata.uid)
+    Mounts:
+      /charm/bin from charm-data (rw,path="charm/bin")
+      /charm/containers from charm-data (rw,path="charm/containers")
+      /containeragent/pebble from charm-data (rw,path="containeragent/pebble")
+      /var/lib/juju from charm-data (rw,path="var/lib/juju")
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bbhbh (ro)
+Containers:
+  charm:
+    Container ID:  containerd://f3d09870c54a4eac0a9fa814339a97ba248edf8770e64ed814bce3be05318f90
+    Image:         docker.io/jujusolutions/charm-base:ubuntu-22.04
+    Image ID:      docker.io/jujusolutions/charm-base@sha256:8e9370ea112f36bf4d374dd438ae24616b05e8a6af5a5930ba1170e12663bcd4
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /charm/bin/pebble
+    Args:
+      run
+      --http
+      :38812
+      --verbose
+    State:          Running
+      Started:      Thu, 22 Feb 2024 17:16:32 +0100
+    Ready:          True
+    Restart Count:  0
+    Liveness:       http-get http://:38812/v1/health%3Flevel=alive delay=30s timeout=1s period=5s #success=1 #failure=1
+    Readiness:      http-get http://:38812/v1/health%3Flevel=ready delay=30s timeout=1s period=5s #success=1 #failure=1
+    Startup:        http-get http://:38812/v1/health%3Flevel=alive delay=30s timeout=1s period=5s #success=1 #failure=1
+    Environment:
+      JUJU_CONTAINER_NAMES:  mysql
+      HTTP_PROBE_PORT:       3856
+    Mounts:
+      /charm/bin from charm-data (ro,path="charm/bin")
+      /charm/containers from charm-data (rw,path="charm/containers")
+      /var/lib/juju from charm-data (rw,path="var/lib/juju")
+      /var/lib/juju/storage/database/0 from mysql-k8s-database-6b84f068 (rw)
+      /var/lib/pebble/default from charm-data (rw,path="containeragent/pebble")
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bbhbh (ro)
+  mysql:
+    Container ID:  containerd://c64d49dae9b05b7cf2cd4a20830fa696e31003bea20ab0cc26a3e50cab43eeb6
+    Image:         registry.jujucharms.com/charm/62ptdfbrjpw3n9tcnswjpart30jauc6wc5wbi/mysql-image@sha256:b0d2e028aa86173918c319a0728a1124b6f025985bc6e9774f32d30bbfc96722
+    Image ID:      registry.jujucharms.com/charm/62ptdfbrjpw3n9tcnswjpart30jauc6wc5wbi/mysql-image@sha256:b0d2e028aa86173918c319a0728a1124b6f025985bc6e9774f32d30bbfc96722
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      /charm/bin/pebble
+    Args:
+      run
+      --create-dirs
+      --hold
+      --http
+      :38813
+      --verbose
+    State:          Running
+      Started:      Thu, 22 Feb 2024 17:36:22 +0100
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Thu, 22 Feb 2024 17:19:23 +0100
+      Finished:     Thu, 22 Feb 2024 17:36:21 +0100
+    Ready:          True
+    Restart Count:  1
+    Liveness:       http-get http://:38813/v1/health%3Flevel=alive delay=30s timeout=1s period=5s #success=1 #failure=1
+    Readiness:      http-get http://:38813/v1/health%3Flevel=ready delay=30s timeout=1s period=5s #success=1 #failure=1
+    Environment:
+      JUJU_CONTAINER_NAME:  mysql
+      PEBBLE_SOCKET:        /charm/container/pebble.socket
+    Mounts:
+      /charm/bin/pebble from charm-data (ro,path="charm/bin/pebble")
+      /charm/container from charm-data (rw,path="charm/containers/mysql")
+      /var/lib/mysql from mysql-k8s-database-6b84f068 (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-bbhbh (ro)
+Conditions:
+  Type              Status
+  Initialized       True 
+  Ready             True 
+  ContainersReady   True 
+  PodScheduled      True 
+Volumes:
+  mysql-k8s-database-6b84f068:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  mysql-k8s-database-6b84f068-mysql-k8s-0
+    ReadOnly:   false
+  charm-data:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-bbhbh:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              kubernetes.io/arch=amd64
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:                      <none>
