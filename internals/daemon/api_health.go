@@ -16,6 +16,7 @@ package daemon
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/canonical/x-go/strutil"
 
@@ -29,6 +30,9 @@ type healthInfo struct {
 }
 
 func v1Health(c *Command, r *http.Request, _ *UserState) Response {
+	start_ts := time.Now()
+	logger.Noticef("api_health.go v1Health from %s started at %s", r.RemoteAddr, start_ts.String())
+
 	query := r.URL.Query()
 	level := plan.CheckLevel(query.Get("level"))
 	switch level {
@@ -36,14 +40,17 @@ func v1Health(c *Command, r *http.Request, _ *UserState) Response {
 	default:
 		return BadRequest(`level must be "alive" or "ready"`)
 	}
+	logger.Noticef("api_health.go v1Health from %s level calculation: %v", r.RemoteAddr, time.Since(start_ts))
 
 	names := strutil.MultiCommaSeparatedList(query["names"])
+	logger.Noticef("api_health.go v1Health from %s MultiCommaSeparatedList: %v", r.RemoteAddr, time.Since(start_ts))
 
 	checks, err := getChecks(c.d.overlord)
 	if err != nil {
 		logger.Noticef("Cannot fetch checks: %v", err.Error())
 		return InternalError("internal server error")
 	}
+	logger.Noticef("api_health.go v1Health from %s getChecks: %v", r.RemoteAddr, time.Since(start_ts))
 
 	healthy := true
 	status := http.StatusOK
@@ -56,10 +63,14 @@ func v1Health(c *Command, r *http.Request, _ *UserState) Response {
 			status = http.StatusBadGateway
 		}
 	}
+	logger.Noticef("api_health.go v1Health from %s level processing: %v", r.RemoteAddr, time.Since(start_ts))
 
-	return SyncResponse(&resp{
+	sync_resp := SyncResponse(&resp{
 		Type:   ResponseTypeSync,
 		Status: status,
 		Result: healthInfo{Healthy: healthy},
 	})
+	logger.Noticef("api_health.go v1Health from %s sync response: %v", r.RemoteAddr, time.Since(start_ts))
+	logger.Noticef("api_health.go v1Health from %s finished: %s", r.RemoteAddr, time.Now().String())
+	return sync_resp
 }

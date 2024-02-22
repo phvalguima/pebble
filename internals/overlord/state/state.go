@@ -170,8 +170,10 @@ type marshalledState struct {
 
 // MarshalJSON makes State a json.Marshaller
 func (s *State) MarshalJSON() ([]byte, error) {
+	logger.Noticef("state.MarshalJSON started: %s", time.Now().String())
 	s.reading()
-	return json.Marshal(marshalledState{
+	logger.Noticef("state.MarshalJSON released reading lock: %s", time.Now().String())
+	marshalled, err := json.Marshal(marshalledState{
 		Data:     s.data,
 		Changes:  s.changes,
 		Tasks:    s.tasks,
@@ -183,11 +185,15 @@ func (s *State) MarshalJSON() ([]byte, error) {
 		LastLaneId:   s.lastLaneId,
 		LastNoticeId: s.lastNoticeId,
 	})
+	logger.Noticef("state.MarshalJSON data mashal: %s", time.Now().String())
+	return marshalled, err
 }
 
 // UnmarshalJSON makes State a json.Unmarshaller
 func (s *State) UnmarshalJSON(data []byte) error {
+	logger.Noticef("state.UnmarshalJSON started: %s", time.Now().String())
 	s.writing()
+	logger.Noticef("state.UnmarshalJSON writing lock released: %s", time.Now().String())
 	var unmarshalled marshalledState
 	err := json.Unmarshal(data, &unmarshalled)
 	if err != nil {
@@ -210,6 +216,7 @@ func (s *State) UnmarshalJSON(data []byte) error {
 		chg.state = s
 		chg.finishUnmarshal()
 	}
+	logger.Noticef("state.UnmarshalJSON finished: %s", time.Now().String())
 	return nil
 }
 

@@ -212,17 +212,22 @@ func (c *Command) Daemon() *Daemon {
 }
 
 func (c *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	start_ts := time.Now()
+	logger.Noticef("daemon.go ServerHTTP from %s started: %s", r.RemoteAddr, start_ts.String())
+
 	user, err := userFromRequest(nil, r) // don't pass state as this does nothing right now
 	if err != nil {
 		Forbidden("forbidden").ServeHTTP(w, r)
 		return
 	}
+	logger.Noticef("daemon.go ServerHTTP from %s userFromRequest: %s", r.RemoteAddr, time.Since(start_ts))
 
 	// check if we are in degradedMode
 	if c.d.degradedErr != nil && r.Method != "GET" {
 		InternalError(c.d.degradedErr.Error()).ServeHTTP(w, r)
 		return
 	}
+	logger.Noticef("daemon.go ServerHTTP from %s maybe ServerHTTP if not GET: %s", r.RemoteAddr, time.Since(start_ts))
 
 	switch c.canAccess(r, user) {
 	case accessOK:
@@ -234,9 +239,11 @@ func (c *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Forbidden("forbidden").ServeHTTP(w, r)
 		return
 	}
+	logger.Noticef("daemon.go ServerHTTP from %s maybe ServerHTTP if authz error: %s", r.RemoteAddr, time.Since(start_ts))
 
 	var rspf ResponseFunc
 	var rsp = MethodNotAllowed("method %q not allowed", r.Method)
+	logger.Noticef("daemon.go ServerHTTP from %s method not allowed: %s", r.RemoteAddr, time.Since(start_ts))
 
 	switch r.Method {
 	case "GET":
@@ -252,12 +259,17 @@ func (c *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if rspf != nil {
 		rsp = rspf(c, r, user)
 	}
+	logger.Noticef("daemon.go ServerHTTP from %s rspf built: %s", r.RemoteAddr, time.Since(start_ts))
 
 	if rsp, ok := rsp.(*resp); ok {
 		st := c.d.state
+		logger.Noticef("daemon.go ServerHTTP from %s request state Lock: %s", r.RemoteAddr, time.Since(start_ts))
 		st.Lock()
+		logger.Noticef("daemon.go ServerHTTP from %s acquired state Lock: %s", r.RemoteAddr, time.Since(start_ts))
 		_, rst := restart.Pending(st)
+		logger.Noticef("daemon.go ServerHTTP from %s restart pending executed: %s", r.RemoteAddr, time.Since(start_ts))
 		st.Unlock()
+		logger.Noticef("daemon.go ServerHTTP from %s state Lock released: %s", r.RemoteAddr, time.Since(start_ts))
 		switch rst {
 		case restart.RestartSystem:
 			rsp.transmitMaintenance(errorKindSystemRestart, "system is restarting")
@@ -266,15 +278,25 @@ func (c *Command) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case restart.RestartSocket:
 			rsp.transmitMaintenance(errorKindDaemonRestart, "daemon is stopping to wait for socket activation")
 		}
+		logger.Noticef("daemon.go ServerHTTP from %s transmitMaintenance finished: %s", r.RemoteAddr, time.Since(start_ts))
 		if rsp.Type != ResponseTypeError {
+			logger.Noticef("daemon.go ServerHTTP from %s start rsp.Type if: %s", r.RemoteAddr, time.Since(start_ts))
 			st.Lock()
+			logger.Noticef("daemon.go ServerHTTP from %s start rsp.Type if acquired state Lock: %s", r.RemoteAddr, time.Since(start_ts))
 			count, stamp := st.WarningsSummary()
+			logger.Noticef("daemon.go ServerHTTP from %s start rsp.Type if warningsSummary finished: %s", r.RemoteAddr, time.Since(start_ts))
 			st.Unlock()
+			logger.Noticef("daemon.go ServerHTTP from %s start rsp.Type if unlocked state: %s", r.RemoteAddr, time.Since(start_ts))
 			rsp.addWarningsToMeta(count, stamp)
+			logger.Noticef("daemon.go ServerHTTP from %s start rsp.Type if addWarningsToMeta finished: %s", r.RemoteAddr, time.Since(start_ts))
 		}
 	}
+	logger.Noticef("daemon.go ServerHTTP from %s ended rsp logic: %s", r.RemoteAddr, time.Since(start_ts))
 
+	logger.Noticef("daemon.go ServerHTTP from %s final ServeHTTP: %s", r.RemoteAddr, time.Since(start_ts))
 	rsp.ServeHTTP(w, r)
+	logger.Noticef("daemon.go ServerHTTP from %s final ServeHTTP finished: %s", r.RemoteAddr, time.Since(start_ts))
+	logger.Noticef("daemon.go ServerHTTP ended: %s", time.Now().String())
 }
 
 type wrappedWriter struct {
@@ -332,8 +354,7 @@ func logit(handler http.Handler) http.Handler {
 		// health, for example).
 		skipLog := r.Method == "GET" &&
 			(strings.HasPrefix(r.URL.Path, "/v1/changes/") && strings.Count(r.URL.Path, "/") == 3 ||
-				r.URL.Path == "/v1/system-info" ||
-				r.URL.Path == "/v1/health")
+				r.URL.Path == "/v1/system-info")
 		if !skipLog {
 			if strings.HasSuffix(r.RemoteAddr, ";") {
 				logger.Debugf("%s %s %s %s %d", r.RemoteAddr, r.Method, r.URL, t, ww.status())
